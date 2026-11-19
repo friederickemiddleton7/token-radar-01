@@ -275,7 +275,7 @@ function quantileSummary(values) {
 }
 
 /**
- * The whole radar: two cohorts, ranked apart and never merged. The pre-token cohort is the watchlist
+ * The whole radar: two cohorts, ranked apart on the page and never merged into one ordering. The pre-token cohort is the watchlist
  * plus every protocol the snapshot records no token for; the trading cohort is every protocol whose
  * token already trades, valued by the same model so the page can show the model's own error on them.
  */
@@ -294,7 +294,7 @@ export function buildRadar(snapshot) {
       return { ...p, cohort: 'pre-token', token_status: 'no-token-recorded', watchlist: watch.has(p.slug), ...v, farm: { chain: plan.chain, capital: plan.capital, hold: plan.hold, mode: plan.mode, gas: plan.gas }, farm_steps: plan.steps };
     })
     .sort((a, b) => b.implied_value_usd - a.implied_value_usd || order(a.slug, b.slug))
-    .map((r, i) => ({ ...r, rank: i + 1 }));
+    .map((r, i) => ({ ...r, cohort_rank: i + 1 }));
 
   const trading = protocols
     .filter((p) => hasToken(p) && p.tvl_usd > 0)
@@ -304,6 +304,13 @@ export function buildRadar(snapshot) {
       const gap = p.mcap_usd > 0 ? round(Math.log(v.implied_value_usd / p.mcap_usd), 3) : null;
       return { ...p, cohort: 'trading', token_status: 'trading', watchlist: false, ...v, model_gap_log: gap, farm: { chain: plan.chain, capital: plan.capital, hold: plan.hold, mode: plan.mode, gas: plan.gas }, farm_steps: plan.steps };
     })
+    .sort((a, b) => b.implied_value_usd - a.implied_value_usd || order(a.slug, b.slug))
+    .map((r, i) => ({ ...r, cohort_rank: i + 1 }));
+
+  // The board's own rank is global and dense: 1..N once each over every row, by implied value, so
+  // the gate's sorted_by_value holds. The page keeps the two cohorts apart and shows each row's
+  // place inside its own cohort (cohort_rank); the global rank is the board's claim, not the page's order.
+  const rows = [...preToken, ...trading]
     .sort((a, b) => b.implied_value_usd - a.implied_value_usd || order(a.slug, b.slug))
     .map((r, i) => ({ ...r, rank: i + 1 }));
 
@@ -343,7 +350,7 @@ export function buildRadar(snapshot) {
     universe: protocols.length,
     watchlist: snapshot.watchlist,
     cohorts: { preToken, trading },
-    rows: [...preToken, ...trading],
+    rows,
     ceiling: round(ceiling, 3),
     ceiling_quantile: CAP_QUANTILE,
     k: K,

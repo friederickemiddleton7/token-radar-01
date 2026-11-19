@@ -57,7 +57,7 @@ if (slugs.size !== rows.length) fail('a slug appears twice on the board');
 for (const want of snapshot.watchlist) if (!slugs.has(want)) fail(`watchlist slug ${want} is missing from the board`);
 for (const cohort of [preToken, trading]) {
   cohort.forEach((r, i) => {
-    if (r.rank !== i + 1) fail(`ranks are not dense in ${r.cohort}: ${r.slug} is ${r.rank} at ${i + 1}`);
+    if (r.cohort_rank !== i + 1) fail(`cohort ranks are not dense in ${r.cohort}: ${r.slug} is ${r.cohort_rank} at ${i + 1}`);
     if (!Number.isSafeInteger(r.implied_value_usd) || r.implied_value_usd < 1 || r.implied_value_usd > 1e14) fail(`implied value out of range: ${r.slug}`);
     if (i > 0 && cohort[i - 1]!.implied_value_usd < r.implied_value_usd) fail(`values are not monotone in ${r.cohort} at ${r.slug}`);
     if (r.farm_steps.length < 5 || r.farm_steps.length > 7) fail(`farm plan length ${r.farm_steps.length} for ${r.slug}`);
@@ -68,6 +68,14 @@ for (const cohort of [preToken, trading]) {
   });
 }
 if (new Set(preToken.map((r) => r.implied_value_usd)).size < 2) fail('the pre-token cohort ranks nothing by value');
+
+// The gate's sorted_by_value: the whole board's ranks are exactly 1..N once each, and the value
+// never rises as the rank ascends.
+{
+  const byRank = [...rows].sort((a, b) => a.rank - b.rank);
+  if (byRank.some((r, i) => r.rank !== i + 1)) fail('the board ranks are not 1..N once each over all rows');
+  for (let i = 1; i < byRank.length; i++) if (byRank[i - 1]!.implied_value_usd < byRank[i]!.implied_value_usd) fail(`values rise as rank ascends at ${byRank[i]!.slug}`);
+}
 
 const out = resolve(arg('output', process.env.MAKEFUN_OUTPUT_DIR ?? '/output'));
 if (out === resolve(here) || out === resolve(here, 'dashboard') || out === resolve(here, 'screenshots')) fail('output must not overwrite the source');

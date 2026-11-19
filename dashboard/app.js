@@ -62,8 +62,8 @@ function sortRows(rows) {
     value: (x, y) => y.implied_value_usd - x.implied_value_usd,
     tvl: (x, y) => y.tvl_usd - x.tvl_usd,
     ratio: (x, y) => ratioOf(y) - ratioOf(x),
-    rank: (x, y) => x.rank - y.rank,
-  }[sort] ?? ((x, y) => x.rank - y.rank);
+    rank: (x, y) => x.cohort_rank - y.cohort_rank,
+  }[sort] ?? ((x, y) => x.cohort_rank - y.cohort_rank);
   return [...rows].sort(cmp);
 }
 
@@ -80,7 +80,7 @@ function tableA(rows) {
     <th>7D</th><th>Conf.</th>
   </tr></thead><tbody>${rows.map((r) => `
   <tr data-slug="${r.slug}" class="${r.slug === selected && !detail ? 'selected' : ''}">
-    <td class="rank">${r.rank}</td>
+    <td class="rank">${r.cohort_rank}</td>
     <td class="proto"><button class="protocol" data-detail="${r.slug}">${r.name}</button>
       <small>${r.category ?? 'Uncategorized'} · ${r.chains.slice(0, 3).join(' · ') || 'chain tidak tercatat'}${r.watchlist ? ' · watchlist' : ''}</small></td>
     <td class="value num"><b>${money(r.implied_value_usd)}</b><small>${money(r.low_usd)}–${money(r.high_usd)}</small>
@@ -107,7 +107,7 @@ function tableB(rows) {
     const cls = g === null ? '' : g >= 1 ? 'gap-pos' : 'gap-neg';
     return `
   <tr data-slug="${r.slug}" class="${r.slug === selected && !detail ? 'selected' : ''}">
-    <td class="rank">${r.rank}</td>
+    <td class="rank">${r.cohort_rank}</td>
     <td class="proto"><button class="protocol" data-detail="${r.slug}">${r.name}</button>
       <span class="sym">${r.symbol ?? '—'}</span>
       <small>${r.category ?? 'Uncategorized'} · ${r.chains.slice(0, 2).join(' · ') || 'chain tidak tercatat'}</small></td>
@@ -140,7 +140,7 @@ function aside(r) {
   const trading = r.cohort === 'trading';
   const g = gapOf(r);
   return `<aside class="aside">
-    <p class="eyebrow">${trading ? 'Kohort B · sudah trading' : 'Kohort A · belum bertoken'} · peringkat ${r.rank} · ${r.watchlist ? 'watchlist' : 'radar'}</p>
+    <p class="eyebrow">${trading ? 'Kohort B · sudah trading' : 'Kohort A · belum bertoken'} · peringkat ${r.cohort_rank} kohort · papan #${r.rank} · ${r.watchlist ? 'watchlist' : 'radar'}</p>
     <h2>${r.name}</h2>
     <p class="muted">${r.category ?? 'Kategori tidak tercatat'} · ${r.chains.join(', ') || 'chain tidak tercatat'}</p>
     <div class="big">${money(r.implied_value_usd)}</div>
