@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lensa · Token Radar 01</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">LENSA / TOKEN RADAR 01 · SNAPSHOT SEALED</p>
+      <h1>Dua kohort, satu model: yang bertoken sudah dihargai pasar, yang belum masih ditebak.</h1>
+      <p class="sub">Papan riset offline dari <span id="protocols">—</span> protokol di snapshot. Kohort A belum punya token dan dinilai dengan pembanding; kohort B sudah punya token dan dipakai mengukur kesalahan model itu sendiri. Angka adalah estimasi, bukan janji peluncuran.</p>
+    </div>
+    <div class="seal">
+      <span id="asof">sealed</span>
+      <b id="count">—</b>
+      <small>baris dinilai, dua kohort terpisah</small>
+      <dl class="seal-grid">
+        <div><dt>A</dt><dd id="chip-a">—</dd></div>
+        <div><dt>B</dt><dd id="chip-b">—</dd></div>
+        <div><dt>WL</dt><dd id="watch">—</dd></div>
+      </dl>
+    </div>
+  </header>
+
+  <section class="rulebar">
+    <div><b>Kohort A · belum bertoken</b><span>gecko_id = null dan symbol = null; watchlist jadi lantai, bukan langit-langit</span></div>
+    <div><b>Kohort B · token sudah trading</b><span>gecko_id atau symbol terisi; dinilai model yang sama, tidak pernah dicampur ke peringkat A</span></div>
+    <div><b>Model</b><span>median log mcap/TVL per kategori pita TVL, empirical Bayes n/(n+4)</span></div>
+  </section>
+
+  <nav class="tabs">
+    <button class="active" data-tab="board">RADAR DUA KOHORT</button>
+    <button data-tab="trading">KOHORT B SAJA</button>
+    <button data-tab="method">METODOLOGI</button>
+  </nav>
+
+  <section id="controls" class="controls">
+    <input id="search" placeholder="Cari protokol, kategori, ticker…">
+    <select id="category"><option value="">Semua kategori</option></select>
+    <select id="confidence">
+      <option value="">Semua confidence</option>
+      <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
+    </select>
+    <label class="check"><input type="checkbox" id="watchOnly"> Hanya watchlist</label>
+    <span id="shown"></span>
+  </section>
+
+  <section id="app"></section>
+
+  <footer>
+    Snapshot sealed <span id="source">—</span>. Fakta berasal dari snapshot; setiap rencana farm tetap harus diverifikasi di dokumentasi resmi. Reward yang belum diumumkan bernilai $0.
+  </footer>
+</main>
+<script src="../data.js"></script>
+<script src="app.js" type="module"></script>
+</body>
+</html>
